@@ -2,6 +2,6 @@
 
 Goal is to understand how Compiler works.
 
-We will divide compiler design into phases
+Compiler design comprising of multiple phases
 
-Current Focus is on ----> Phase 1 : Lexical Analyser
+Oue current Focus is on ----> Phase 1 : Lexical Analyser
