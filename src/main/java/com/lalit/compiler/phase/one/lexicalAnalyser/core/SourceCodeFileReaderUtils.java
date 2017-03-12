@@ -1,10 +1,10 @@
-package com.lalit.compiler.phase.one.lexicalAnalyser.utils;
+package com.lalit.compiler.phase.one.lexicalAnalyser.core;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class FileReadUtils {
+public class SourceCodeFileReaderUtils {
 	public static void main(String[] args) {
 		File file = new File(args[0]);
 		if (!file.exists()) {
