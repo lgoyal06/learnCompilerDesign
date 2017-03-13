@@ -4,6 +4,11 @@ import java.util.HashMap;
 
 public class Token {
 
+	public Token(String tokenType, HashMap<String, String> attributes) {
+		this.tokenType = tokenType;
+		this.attributes = attributes;
+	}
+
 	private String tokenType;
 	private HashMap<String, String> attributes;
 
