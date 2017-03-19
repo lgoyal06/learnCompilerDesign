@@ -18,6 +18,10 @@ public class SourceCodeFileReaderUtils {
 	public static void main(String[] args) throws IOException {
 		File file = new File(args[0]);
 		FileInputStream fis = null;
+		boolean isStringLiteralFound = false;
+		boolean isCommentTokenFound = false;
+		String currentCommentTokenStartingTag = "";
+		String currentCommentTokenClosingTag = "";
 		if (!file.exists()) {
 			System.out.println(args[0] + " does not exist.");
 			return;
@@ -33,19 +37,44 @@ public class SourceCodeFileReaderUtils {
 				currentChar = (char) fis.read();
 				currentLexeme = currentLexeme.append(currentChar);
 				++forwardPointerIndex;
-				// TODO String Literal Token
-				// if (currentChar == '\"') {
+				// // TODO Priority 2 String Literal Token
+				// if (currentChar == '"') {
+				// isStringLitrealFound =true;
+				//
 				// continue;
 				// }
 
-				// TODO Comment Token
-				// Wait till new line character and add as Comment token
-				// if
-				// (TokenPatternMatcher.isMatchingCommentToken(currentLexeme.toString().trim()))
-				// {
-				// buildTokenAndAddToList(currentLexeme.toString().trim(),
-				// "Separator");
-				// }
+				// TODO Priority 1 Doing Comment Token
+				if (TokenPatternMatcher.isMatchingCommentToken(currentLexeme.toString().trim())
+						|| (isCommentTokenFound)) {
+					if (!isCommentTokenFound) {
+						currentCommentTokenStartingTag = currentLexeme.toString().trim();
+						currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
+						currentLexemeIndex = forwardPointerIndex;
+						isCommentTokenFound = true;
+					} else if (currentCommentTokenStartingTag.equals("//")
+							&& (currentChar == '\r' || currentChar == '\n')) {
+						buildTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Comments");
+						currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
+						currentLexemeIndex = forwardPointerIndex;
+						isCommentTokenFound = false;
+						currentCommentTokenStartingTag = "";
+					} else if ("/*".equals(currentCommentTokenStartingTag)
+							&& (currentChar == '*' || currentChar == '/')) {
+						currentCommentTokenClosingTag = currentCommentTokenClosingTag + String.valueOf(currentChar);
+						if ("*/".equals(currentCommentTokenClosingTag)) {
+							buildTokenObjAndAddToTokenList(
+									currentLexeme.toString().trim().substring(0, currentLexeme.length() - 3),
+									"Comments");
+							currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
+							currentLexemeIndex = forwardPointerIndex;
+							isCommentTokenFound = false;
+							currentCommentTokenStartingTag = "";
+							currentCommentTokenClosingTag = "";
+						}
+					}
+					continue;
+				}
 
 				if (currentChar == ' ' || TokenPatternMatcher.isMatchingCharLiteralToken(currentChar)
 						|| TokenPatternMatcher.isMatchingSeparatorToken(currentChar)) {
@@ -73,6 +102,11 @@ public class SourceCodeFileReaderUtils {
 					currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
 					currentLexemeIndex = forwardPointerIndex;
 				}
+			}
+			if (isCommentTokenFound) {
+				buildTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Comments");
+				currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
+				currentLexemeIndex = forwardPointerIndex;
 			}
 			printTokenOnConsoleForDeveloper(tokenList);
 		} catch (IOException e) {

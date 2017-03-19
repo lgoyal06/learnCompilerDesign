@@ -100,6 +100,10 @@ public class TokenPatternMatcher {
 
 	// Transition Diagram for Comment Literal
 	public static boolean isMatchingCommentToken(String word) {
+		for (String operator : TokenTypes.COMMENTS_TOKEN_LIST)
+			if (operator.equals(word)) {
+				return true;
+			}
 		return false;
 	}
 
