@@ -8,6 +8,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.lalit.compiler.phase.one.lexicalAnalyser.utils.DataTypeConversionUtils;
+
+/**
+ * @author lalit goyal
+ * 
+ *         TODO Build framework around testing of Lexical Analysis phase
+ * 
+ *         TODO Target to complete by 26th March 2017
+ */
 public class SourceCodeFileReaderUtils {
 
 	static int currentLexemeIndex = 0;
@@ -37,14 +46,18 @@ public class SourceCodeFileReaderUtils {
 				currentChar = (char) fis.read();
 				currentLexeme = currentLexeme.append(currentChar);
 				++forwardPointerIndex;
-				// // TODO Priority 2 String Literal Token
+
+				// // TODO Do on 22nd March 2017 String Literal Token
 				// if (currentChar == '"') {
 				// isStringLitrealFound =true;
 				//
 				// continue;
 				// }
 
-				// TODO Priority 1 Doing Comment Token
+				/*
+				 * Comments Token Code done and tested with
+				 * CommentsTokenSampleFile.txt Dated : 21 March 2017
+				 */
 				if (TokenPatternMatcher.isMatchingCommentToken(currentLexeme.toString().trim())
 						|| (isCommentTokenFound)) {
 					if (!isCommentTokenFound) {
@@ -64,14 +77,16 @@ public class SourceCodeFileReaderUtils {
 						currentCommentTokenClosingTag = currentCommentTokenClosingTag + String.valueOf(currentChar);
 						if ("*/".equals(currentCommentTokenClosingTag)) {
 							buildTokenObjAndAddToTokenList(
-									currentLexeme.toString().trim().substring(0, currentLexeme.length() - 3),
+									currentLexeme.length() <= 2 ? ""
+											: currentLexeme.toString().trim().substring(0, currentLexeme.length() - 3),
 									"Comments");
 							currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
 							currentLexemeIndex = forwardPointerIndex;
 							isCommentTokenFound = false;
 							currentCommentTokenStartingTag = "";
 							currentCommentTokenClosingTag = "";
-						}
+						} else if (currentCommentTokenClosingTag.length() > 1)
+							currentCommentTokenClosingTag = "";
 					}
 					continue;
 				}
@@ -79,8 +94,31 @@ public class SourceCodeFileReaderUtils {
 				if (currentChar == ' ' || TokenPatternMatcher.isMatchingCharLiteralToken(currentChar)
 						|| TokenPatternMatcher.isMatchingSeparatorToken(currentChar)) {
 
-					// Add Separator Token in case if it combined with keywork
-					// or identifier,
+					/*
+					 * TODO Issue Add Separator Token in case if it combined
+					 * with keywork or identifier.
+					 * 
+					 * Example :
+					 * 
+					 * Keyword value:public
+					 * 
+					 * Keyword value:static
+					 * 
+					 * Keyword value:void
+					 * 
+					 * Separator value:(
+					 * 
+					 * Identifier value:main
+					 * 
+					 * Identifier value:String
+					 * 
+					 * Separator value:. Separator value:.
+					 * 
+					 * Separator value:.
+					 * 
+					 * Separator value:)
+					 * 
+					 */
 					if (TokenPatternMatcher.isMatchingSeparatorToken(currentChar)) {
 						buildTokenObjAndAddToTokenList(String.valueOf(currentChar), "Separator");
 						currentLexeme.deleteCharAt(currentLexeme.length() - 1);
@@ -95,9 +133,9 @@ public class SourceCodeFileReaderUtils {
 							.isMatchingSeparatorToken(currentLexeme.toString().trim().toCharArray()[0])) {
 						buildTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Separator");
 					}
-					// TODO print Char literal as \r, \n in console
 					if (TokenPatternMatcher.isMatchingCharLiteralToken(currentChar)) {
-						buildLiteralTypeTokenObjAndAddToTokenList(String.valueOf(currentChar), "Literal", "char");
+						buildLiteralTypeTokenObjAndAddToTokenList(
+								DataTypeConversionUtils.escapeCharToStringConversion(currentChar), "Literal", "char");
 					}
 					currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
 					currentLexemeIndex = forwardPointerIndex;
