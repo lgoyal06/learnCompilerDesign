@@ -28,7 +28,8 @@ public class SourceCodeFileReaderUtils {
 		File file = new File(args[0]);
 		FileInputStream fis = null;
 		boolean isStringLiteralFound = false;
-		boolean isCommentTokenFound = false;
+		boolean isCharLiteralFound = false;
+		boolean isCommentTokenDetected = false;
 		String currentCommentTokenStartingTag = "";
 		String currentCommentTokenClosingTag = "";
 		if (!file.exists()) {
@@ -47,46 +48,39 @@ public class SourceCodeFileReaderUtils {
 				currentLexeme = currentLexeme.append(currentChar);
 				++forwardPointerIndex;
 
-				// // TODO Do on 22nd March 2017 String Literal Token
-				// if (currentChar == '"') {
-				// isStringLitrealFound =true;
-				//
-				// continue;
-				// }
-
 				/*
 				 * Comments Token Code done and tested with
 				 * CommentsTokenSampleFile.txt Dated : 21 March 2017
 				 */
-				if (TokenPatternMatcher.isMatchingCommentToken(currentLexeme.toString().trim())
-						|| (isCommentTokenFound)) {
-					if (!isCommentTokenFound) {
-						currentCommentTokenStartingTag = currentLexeme.toString().trim();
+				if (TokenPatternMatcher.isMatchingCommentToken(currentLexeme.toString()) || (isCommentTokenDetected)) {
+					if (!isCommentTokenDetected) {
+						currentCommentTokenStartingTag = currentLexeme.toString();
 						currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
 						currentLexemeIndex = forwardPointerIndex;
-						isCommentTokenFound = true;
+						isCommentTokenDetected = true;
 					} else if (currentCommentTokenStartingTag.equals("//")
 							&& (currentChar == '\r' || currentChar == '\n')) {
-						buildTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Comments");
+						buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Comments");
 						currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
 						currentLexemeIndex = forwardPointerIndex;
-						isCommentTokenFound = false;
+						isCommentTokenDetected = false;
 						currentCommentTokenStartingTag = "";
 					} else if ("/*".equals(currentCommentTokenStartingTag)
 							&& (currentChar == '*' || currentChar == '/')) {
 						currentCommentTokenClosingTag = currentCommentTokenClosingTag + String.valueOf(currentChar);
-						if ("*/".equals(currentCommentTokenClosingTag)) {
+						char[] chrArr = currentCommentTokenClosingTag.toCharArray();
+						if ((chrArr.length > 1
+								&& (chrArr[chrArr.length - 2] == '*' && chrArr[chrArr.length - 1] == '/'))) {
 							buildTokenObjAndAddToTokenList(
 									currentLexeme.length() <= 2 ? ""
-											: currentLexeme.toString().trim().substring(0, currentLexeme.length() - 3),
+											: currentLexeme.toString().substring(0, currentLexeme.length() - 2),
 									"Comments");
 							currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
 							currentLexemeIndex = forwardPointerIndex;
-							isCommentTokenFound = false;
+							isCommentTokenDetected = false;
 							currentCommentTokenStartingTag = "";
 							currentCommentTokenClosingTag = "";
-						} else if (currentCommentTokenClosingTag.length() > 1)
-							currentCommentTokenClosingTag = "";
+						}
 					}
 					continue;
 				}
@@ -125,13 +119,13 @@ public class SourceCodeFileReaderUtils {
 					}
 					if (TokenPatternMatcher.isMatchingKeywordToken(currentLexeme.toString().trim())) {
 						buildTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Keyword");
-					} else if (TokenPatternMatcher.isMatchingOperatorToken(currentLexeme.toString().trim())) {
-						buildTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Operator");
-					} else if (TokenPatternMatcher.isMatchingIdentifierToken(currentLexeme.toString().trim())) {
-						buildTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Identifier");
-					} else if (currentLexeme.toString().trim().length() == 1 && TokenPatternMatcher
-							.isMatchingSeparatorToken(currentLexeme.toString().trim().toCharArray()[0])) {
-						buildTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Separator");
+					} else if (TokenPatternMatcher.isMatchingOperatorToken(currentLexeme.toString())) {
+						buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Operator");
+					} else if (TokenPatternMatcher.isMatchingIdentifierToken(currentLexeme.toString())) {
+						buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Identifier");
+					} else if (currentLexeme.toString().length() == 1 && TokenPatternMatcher
+							.isMatchingSeparatorToken(currentLexeme.toString().toCharArray()[0])) {
+						buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Separator");
 					}
 					if (TokenPatternMatcher.isMatchingCharLiteralToken(currentChar)) {
 						buildLiteralTypeTokenObjAndAddToTokenList(
@@ -141,8 +135,8 @@ public class SourceCodeFileReaderUtils {
 					currentLexemeIndex = forwardPointerIndex;
 				}
 			}
-			if (isCommentTokenFound) {
-				buildTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Comments");
+			if (isCommentTokenDetected) {
+				buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Comments");
 				currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
 				currentLexemeIndex = forwardPointerIndex;
 			}
