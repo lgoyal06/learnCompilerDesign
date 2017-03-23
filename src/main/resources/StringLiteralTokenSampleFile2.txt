@@ -1,0 +1,13 @@
+/*
+* @a jhgjghj hfg
+*/
+public class Hello {
+
+public static void main(String ...s) {
+
+	String st = "STRING";
+	System.out.println("Hi World!");
+	
+   }
+
+}

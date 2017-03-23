@@ -49,6 +49,20 @@ public class SourceCodeFileReaderUtils {
 				++forwardPointerIndex;
 
 				/*
+				 * TODO 24th String and Char literals both
+				 * 
+				 * if ((!isStringLiteralFound && !isCommentTokenDetected &&
+				 * TokenPatternMatcher.isMatchingCharLiteralToken(currentChar))
+				 * || (isCharLiteralFound)) { if (!isCharLiteralFound) {
+				 * isCharLiteralFound = true; } continue; }
+				 * 
+				 * if ((!isCommentTokenDetected &&
+				 * TokenPatternMatcher.isMatchingCharLiteralToken(currentChar))
+				 * || (isStringLiteralFound)) { if (!isStringLiteralFound) {
+				 * isStringLiteralFound = true; } continue; }
+				 */
+
+				/*
 				 * Comments Token Code done and tested with
 				 * CommentsTokenSampleFile.txt Dated : 21 March 2017
 				 */
