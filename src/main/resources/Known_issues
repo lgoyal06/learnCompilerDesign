@@ -1,0 +1,29 @@
+Issue 1: We are expecting all token (except string , char literals, comments) to be separated by whitespace ' '
+	     We need to start supporting token creation without whitespace between to tokens
+
+Issue 2:
+					/
+					  TODO Issue Add Separator Token in case if it combined
+					  with keywork or identifier.
+					  
+					  Example :
+					  
+					  Keyword value:public
+					  
+					  Keyword value:static
+					  
+					  Keyword value:void
+					  
+					  Separator value:(
+					  
+					  Identifier value:main
+					  
+					  Identifier value:String
+					  
+					  Separator value:. Separator value:.
+					  
+					  Separator value:.
+					  
+					  Separator value:)
+					  
+					 /

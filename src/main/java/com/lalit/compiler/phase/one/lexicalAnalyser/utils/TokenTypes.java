@@ -15,7 +15,7 @@ public class TokenTypes {
 			"<=", ">=", "!=", "&&", "||", "++", "--", "+", "-", "*", "/", "&", "|", "^", "%", "<<", ">>", ">>>", "+=",
 			"-=", "*=", "/=", "&=", "|=", "^=", "%=", "<<=", ">>=", ">>=" };
 
-	public static final char[] ESCAPE_SQUENCECES_LIST = new char[] { '\n', '\t', '\b', '\r', '\f', '\\', '\'', '\"' };
+	public static final char[] ESCAPE_SQUENCECES_LIST = new char[] { '\n', '\t', '\b', '\r', '\f' };
 
 	public static final String[] COMMENTS_TOKEN_LIST = new String[] { "//", "/*", "*/" };
 

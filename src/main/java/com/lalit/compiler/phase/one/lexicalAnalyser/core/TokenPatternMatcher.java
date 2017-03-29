@@ -65,10 +65,15 @@ public class TokenPatternMatcher {
 		return false;
 	}
 
-	public boolean isMatchingIntLiteralPattern(char charac) {
-		if (isMatchingNumericPattern(charac))
-			return true;
-		return false;
+	public static boolean isMatchingIntLiteralPattern(String word) {
+		if (word.length() == 0) {
+			return false;
+		}
+		char[] charArray = word.toCharArray();
+		for (char chara : charArray)
+			if (!isMatchingNumericPattern(chara))
+				return false;
+		return true;
 	}
 
 	// Transition Diagram for Arithimatic or Logical Operators
@@ -93,16 +98,22 @@ public class TokenPatternMatcher {
 
 	// Transition Diagram for Char Literal
 	public static boolean isMatchingCharLiteralToken(char chara) {
-		for (char escChar : TokenTypes.ESCAPE_SQUENCECES_LIST) {
-			if (chara == escChar) {
-				return true;
-			}
-		}
 		for (char escChar : TokenTypes.CHAR_LITERALS_TOKEN_LIST) {
 			if (chara == escChar) {
 				return true;
 			}
 		}
+		return false;
+	}
+
+	// Transition Diagram for Char Escape Literal
+	public static boolean isMatchingCharEscapeLiteralToken(char chara) {
+		for (char escChar : TokenTypes.ESCAPE_SQUENCECES_LIST) {
+			if (chara == escChar) {
+				return true;
+			}
+		}
+
 		return false;
 	}
 
