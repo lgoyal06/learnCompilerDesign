@@ -49,12 +49,80 @@ public class SourceCodeFileReaderUtils {
 				++forwardPointerIndex;
 
 				/*
-				 * Comments Token Code done and tested with
+				 * Rule 1: Logic String literal
+				 * 
+				 */
+				if ((!isCharLiteralFound && !isCommentTokenDetected)
+						&& (isStringLiteralFound || TokenPatternMatcher.isMatchingStringLiteralToken(currentChar))) {
+					if (!isStringLiteralFound) {
+						isStringLiteralFound = true;
+					} else {
+						// Found Next Double quote
+						if (currentChar == '"') {
+							// Escaped double char i.e. String s = "abd\"ed";
+							if (currentLexeme.charAt(currentLexeme.length() - 2) == '\\') {
+								continue;
+							}
+							// Closing Double quote is found
+							else {
+								buildLiteralTypeTokenObjAndAddToTokenList(
+										currentLexeme.substring(1, currentLexeme.length() - 1), "Literal", "String");
+								currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
+								currentLexemeIndex = forwardPointerIndex;
+								isStringLiteralFound = false;
+							}
+						}
+						// Case end of the line reached but not yet found
+						// closing double quotes . Invalid token error
+						else if (currentChar == '\r' || currentChar == '\n') {
+							buildLiteralTypeTokenWithErrorObjAndAddToTokenList(
+									currentLexeme.substring(0, currentLexeme.length() - 1), "Literal", "String",
+									new String[] { "Invalid String literal should close with dobule quotes" });
+							currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
+							currentLexemeIndex = forwardPointerIndex;
+							isStringLiteralFound = false;
+						}
+					}
+					continue;
+				}
+				/*
+				 * Rule 2: char literal
+				 * 
+				 * 
+				 */
+				if ((!isStringLiteralFound && !isCommentTokenDetected)
+						&& (isCharLiteralFound || TokenPatternMatcher.isMatchingCharLiteralToken(currentChar))) {
+					if (!isCharLiteralFound) {
+						isCharLiteralFound = true;
+					} else if (currentChar == '\'') {
+						// Invalid char token as length >1
+						if (currentLexeme.length() > 3) {
+							buildLiteralTypeTokenWithErrorObjAndAddToTokenList("", "Literal", "char",
+									new String[] { "Invalid char as length more than one" });
+							currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
+							currentLexemeIndex = forwardPointerIndex;
+							isCharLiteralFound = false;
+						} else {
+							buildLiteralTypeTokenObjAndAddToTokenList(
+									DataTypeConversionUtils.escapeCharToStringConversion(currentLexeme.charAt(1)),
+									"Literal", "char");
+							currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
+							currentLexemeIndex = forwardPointerIndex;
+							isCharLiteralFound = false;
+						}
+					}
+					continue;
+				}
+
+				/*
+				 * Rule 3: Comments Token Code done and tested with
 				 * CommentsTokenSampleFile.txt Dated : 21 March 2017
 				 */
-				if (TokenPatternMatcher.isMatchingCommentToken(currentLexeme.toString()) || (isCommentTokenDetected)) {
+
+				if (TokenPatternMatcher.isMatchingCommentToken(currentLexeme.toString().trim())
+						|| (isCommentTokenDetected)) {
 					if (!isCommentTokenDetected) {
-						currentCommentTokenStartingTag = currentLexeme.toString();
+						currentCommentTokenStartingTag = currentLexeme.toString().trim();
 						currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
 						currentLexemeIndex = forwardPointerIndex;
 						isCommentTokenDetected = true;
@@ -85,54 +153,40 @@ public class SourceCodeFileReaderUtils {
 					continue;
 				}
 
-				if (currentChar == ' ' || TokenPatternMatcher.isMatchingCharLiteralToken(currentChar)
-						|| TokenPatternMatcher.isMatchingSeparatorToken(currentChar)) {
+				// Rule 4: Other than Comment, String and char literals
 
-					/*
-					 * TODO Issue Add Separator Token in case if it combined
-					 * with keywork or identifier.
-					 * 
-					 * Example :
-					 * 
-					 * Keyword value:public
-					 * 
-					 * Keyword value:static
-					 * 
-					 * Keyword value:void
-					 * 
-					 * Separator value:(
-					 * 
-					 * Identifier value:main
-					 * 
-					 * Identifier value:String
-					 * 
-					 * Separator value:. Separator value:.
-					 * 
-					 * Separator value:.
-					 * 
-					 * Separator value:)
-					 * 
-					 */
+				if (!isCommentTokenDetected && !isCharLiteralFound && !isStringLiteralFound) {
+					if (currentChar == ' ') {
+						if (TokenPatternMatcher.isMatchingIntLiteralPattern(currentLexeme.toString().trim())) {
+							buildLiteralTypeTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Literal",
+									"int");
+						} else if (TokenPatternMatcher.isMatchingKeywordToken(currentLexeme.toString().trim())) {
+							buildTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Keyword");
+						} else if (TokenPatternMatcher.isMatchingOperatorToken(currentLexeme.toString().trim())) {
+							buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Operator");
+						} else if (TokenPatternMatcher.isMatchingIdentifierToken(currentLexeme.toString())) {
+							buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Identifier");
+						} else if (currentLexeme.toString().length() == 1 && TokenPatternMatcher
+								.isMatchingSeparatorToken(currentLexeme.toString().toCharArray()[0])) {
+							buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Separator");
+						}
+						currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
+						currentLexemeIndex = forwardPointerIndex;
+
+					}
 					if (TokenPatternMatcher.isMatchingSeparatorToken(currentChar)) {
 						buildTokenObjAndAddToTokenList(String.valueOf(currentChar), "Separator");
 						currentLexeme.deleteCharAt(currentLexeme.length() - 1);
+						currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
+						currentLexemeIndex = forwardPointerIndex;
+
 					}
-					if (TokenPatternMatcher.isMatchingKeywordToken(currentLexeme.toString().trim())) {
-						buildTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Keyword");
-					} else if (TokenPatternMatcher.isMatchingOperatorToken(currentLexeme.toString())) {
-						buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Operator");
-					} else if (TokenPatternMatcher.isMatchingIdentifierToken(currentLexeme.toString())) {
-						buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Identifier");
-					} else if (currentLexeme.toString().length() == 1 && TokenPatternMatcher
-							.isMatchingSeparatorToken(currentLexeme.toString().toCharArray()[0])) {
-						buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Separator");
-					}
-					if (TokenPatternMatcher.isMatchingCharLiteralToken(currentChar)) {
+					if (TokenPatternMatcher.isMatchingCharEscapeLiteralToken(currentChar)) {
 						buildLiteralTypeTokenObjAndAddToTokenList(
 								DataTypeConversionUtils.escapeCharToStringConversion(currentChar), "Literal", "char");
+						currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
+						currentLexemeIndex = forwardPointerIndex;
 					}
-					currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
-					currentLexemeIndex = forwardPointerIndex;
 				}
 			}
 			if (isCommentTokenDetected) {
@@ -146,7 +200,6 @@ public class SourceCodeFileReaderUtils {
 		} finally {
 			fis.close();
 		}
-
 	}
 
 	private static void buildTokenObjAndAddToTokenList(String currentToken, String tokenType) {
@@ -163,11 +216,23 @@ public class SourceCodeFileReaderUtils {
 		tokenList.add(new Token(tokenType, attributeValueMap));
 	}
 
+	private static void buildLiteralTypeTokenWithErrorObjAndAddToTokenList(String currentToken, String tokenType,
+			String literalType, String... errorMessage) {
+		HashMap<String, String> attributeValueMap = new HashMap<>();
+		attributeValueMap.put("value", currentToken);
+		attributeValueMap.put("type", literalType);
+		tokenList.add(new Token(tokenType, attributeValueMap, errorMessage));
+	}
+
 	private static void printTokenOnConsoleForDeveloper(List<Token> list) {
 		for (Token token : list) {
 			System.out.println(token.getTokenType());
 			for (Map.Entry<String, String> entry : token.getAttributes().entrySet()) {
 				System.out.println("\t" + entry.getKey() + ":" + entry.getValue());
+			}
+			if (token.getErrorMessages() != null && token.getErrorMessages().length > 0) {
+				for (String error : token.getErrorMessages())
+					System.out.println("\tError: " + error);
 			}
 		}
 	}

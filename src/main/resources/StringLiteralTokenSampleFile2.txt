@@ -1,0 +1,7 @@
+String st = "STRING fgshdfjsdf sdgfjsdgf";
+String st1 = "STRING fgshdfjsdf" + " sdgfjsdgf";
+String st2 = "STRING fgshd\"fjsdf";
+String st3 = "STRING fgshd\"fjsdf"
+ + "sdsdsdsd";
+char r = 'asdsda'
+char e = 'd';

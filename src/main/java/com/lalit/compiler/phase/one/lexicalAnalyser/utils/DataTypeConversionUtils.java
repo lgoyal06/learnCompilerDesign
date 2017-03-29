@@ -30,6 +30,8 @@ public class DataTypeConversionUtils {
 		case '\"':
 			charToString = "\"";
 			break;
+		default:
+			return "" + currentChar + "";
 		}
 		return charToString;
 	}

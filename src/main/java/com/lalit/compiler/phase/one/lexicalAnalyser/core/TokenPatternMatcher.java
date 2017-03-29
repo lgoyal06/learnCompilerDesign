@@ -65,45 +65,75 @@ public class TokenPatternMatcher {
 		return false;
 	}
 
-	public boolean isMatchingIntLiteralPattern(char charac) {
-		if (isMatchingNumericPattern(charac))
-			return true;
-		return false;
+	public static boolean isMatchingIntLiteralPattern(String word) {
+		if (word.length() == 0) {
+			return false;
+		}
+		char[] charArray = word.toCharArray();
+		for (char chara : charArray)
+			if (!isMatchingNumericPattern(chara))
+				return false;
+		return true;
 	}
 
 	// Transition Diagram for Arithimatic or Logical Operators
 	public static boolean isMatchingOperatorToken(String word) {
-		for (String operator : TokenTypes.OPERATORS_TOKEN_LIST)
+		for (String operator : TokenTypes.OPERATORS_TOKEN_LIST) {
 			if (operator.equals(word)) {
 				return true;
 			}
+		}
 		return false;
 	}
 
 	// Transition Diagram for Arithimatic or Logical Operators
 	public static boolean isMatchingSeparatorToken(char charac) {
-		for (char separator : TokenTypes.SEPARATORS_TOKEN_LIST)
+		for (char separator : TokenTypes.SEPARATORS_TOKEN_LIST) {
 			if (separator == charac) {
 				return true;
 			}
+		}
 		return false;
 	}
 
 	// Transition Diagram for Char Literal
 	public static boolean isMatchingCharLiteralToken(char chara) {
-		for (char escChar : TokenTypes.ESCAPE_SQUENCECES_LIST)
+		for (char escChar : TokenTypes.CHAR_LITERALS_TOKEN_LIST) {
 			if (chara == escChar) {
 				return true;
 			}
+		}
+		return false;
+	}
+
+	// Transition Diagram for Char Escape Literal
+	public static boolean isMatchingCharEscapeLiteralToken(char chara) {
+		for (char escChar : TokenTypes.ESCAPE_SQUENCECES_LIST) {
+			if (chara == escChar) {
+				return true;
+			}
+		}
+
 		return false;
 	}
 
 	// Transition Diagram for Comment Literal
 	public static boolean isMatchingCommentToken(String word) {
-		for (String operator : TokenTypes.COMMENTS_TOKEN_LIST)
+		for (String operator : TokenTypes.COMMENTS_TOKEN_LIST) {
 			if (operator.equals(word)) {
 				return true;
 			}
+		}
+		return false;
+	}
+
+	// Transition Diagram for String Literal
+	public static boolean isMatchingStringLiteralToken(char chara) {
+		for (char strLiteral : TokenTypes.STRING_LITERALS_TOKEN_LIST) {
+			if (chara == strLiteral) {
+				return true;
+			}
+		}
 		return false;
 	}
 
