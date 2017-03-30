@@ -7,7 +7,7 @@ public class TokenTypes {
 			"break", "double", "import", "public", "throws", "byte", "else", "instanceof", "return", "transient",
 			"case", "extends", "int", "short", "try", "catch", "final", "interface", "static", "void", "char",
 			"finally", "long", "strictfp", "volatile", "class", "float", "native", "super", "while", "const", "for",
-			"new", "synchronized" };
+			"new", "synchronized", "psvm" };
 
 	public static final char[] SEPARATORS_TOKEN_LIST = new char[] { ';', ',', '(', ')', '{', '}', '[', ']' };
 
