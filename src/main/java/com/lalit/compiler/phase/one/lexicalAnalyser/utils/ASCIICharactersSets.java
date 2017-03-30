@@ -13,4 +13,7 @@ public class ASCIICharactersSets {
 	public static final char[] SPECIAL_CHAR = new char[] { '!', '%', '^', '&', '*', '(', ')', '-', '+', '=', '{', '}',
 			'|', '~', '[', ']', '\\', ';', '\'', ':', '"', '<', '>', '?', ',', '.', '/', '#', '@', '`', '_' };
 
+	public static final char[] DOUBLE_ALLOWED_CHAR = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.',
+			'E', 'e', '+', '-' };
+
 }

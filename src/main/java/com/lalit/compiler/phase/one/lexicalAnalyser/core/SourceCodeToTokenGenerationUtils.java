@@ -13,11 +13,11 @@ import com.lalit.compiler.phase.one.lexicalAnalyser.utils.DataTypeConversionUtil
 /**
  * @author lalit goyal
  * 
- *         TODO Build framework around testing of Lexical Analysis phase
+ *         Assumptions : Only white space (except when inside a textual literal
+ *         or comment) separates tokens.
  * 
- *         TODO Target to complete by 26th March 2017
  */
-public class SourceCodeFileReaderUtils {
+public class SourceCodeToTokenGenerationUtils {
 
 	static int currentLexemeIndex = 0;
 	static int forwardPointerIndex = 0;
@@ -117,6 +117,9 @@ public class SourceCodeFileReaderUtils {
 				/*
 				 * Rule 3: Comments Token Code done and tested with
 				 * CommentsTokenSampleFile.txt Dated : 21 March 2017
+				 * 
+				 * We don't send Comment token to next stage i.e. parser of
+				 * compiler
 				 */
 
 				if (TokenPatternMatcher.isMatchingCommentToken(currentLexeme.toString().trim())
@@ -128,7 +131,6 @@ public class SourceCodeFileReaderUtils {
 						isCommentTokenDetected = true;
 					} else if (currentCommentTokenStartingTag.equals("//")
 							&& (currentChar == '\r' || currentChar == '\n')) {
-						buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Comments");
 						currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
 						currentLexemeIndex = forwardPointerIndex;
 						isCommentTokenDetected = false;
@@ -139,10 +141,6 @@ public class SourceCodeFileReaderUtils {
 						char[] chrArr = currentCommentTokenClosingTag.toCharArray();
 						if ((chrArr.length > 1
 								&& (chrArr[chrArr.length - 2] == '*' && chrArr[chrArr.length - 1] == '/'))) {
-							buildTokenObjAndAddToTokenList(
-									currentLexeme.length() <= 2 ? ""
-											: currentLexeme.toString().substring(0, currentLexeme.length() - 2),
-									"Comments");
 							currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
 							currentLexemeIndex = forwardPointerIndex;
 							isCommentTokenDetected = false;
@@ -153,35 +151,44 @@ public class SourceCodeFileReaderUtils {
 					continue;
 				}
 
-				// Rule 4: Other than Comment, String and char literals
+				/*
+				 * Rule 4: Other than Comment, String and char literals and
+				 * whitespace is found
+				 */
 
 				if (!isCommentTokenDetected && !isCharLiteralFound && !isStringLiteralFound) {
-					if (currentChar == ' ') {
+					if ((currentChar == ' ' || TokenPatternMatcher.isMatchingSeparatorToken(currentChar))
+							&& currentLexeme.toString().trim().length() > 0) {
 						if (TokenPatternMatcher.isMatchingIntLiteralPattern(currentLexeme.toString().trim())) {
 							buildLiteralTypeTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Literal",
 									"int");
+						} else if (TokenPatternMatcher
+								.isMatchingBooleanLiteralPattern(currentLexeme.toString().trim())) {
+							buildLiteralTypeTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Literal",
+									"boolean");
+						} else if (TokenPatternMatcher
+								.isMatchingDoubleLiteralPattern(currentLexeme.toString().trim())) {
+							buildLiteralTypeTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Literal",
+									"double");
+						} else if (TokenPatternMatcher.isMatchingCharEscapeLiteralToken(currentChar)) {
+							buildLiteralTypeTokenObjAndAddToTokenList(
+									DataTypeConversionUtils.escapeCharToStringConversion(currentChar), "Literal",
+									"char");
+						} else if (TokenPatternMatcher.isMatchingSeparatorToken(currentChar)) {
+							buildTokenObjAndAddToTokenList(String.valueOf(currentChar), "Separator");
 						} else if (TokenPatternMatcher.isMatchingKeywordToken(currentLexeme.toString().trim())) {
 							buildTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Keyword");
 						} else if (TokenPatternMatcher.isMatchingOperatorToken(currentLexeme.toString().trim())) {
-							buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Operator");
+							buildTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Operator");
 						} else if (TokenPatternMatcher.isMatchingIdentifierToken(currentLexeme.toString())) {
-							buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Identifier");
+							buildTokenObjAndAddToTokenList(currentLexeme.toString().trim(), "Identifier");
 						} else if (currentLexeme.toString().length() == 1 && TokenPatternMatcher
 								.isMatchingSeparatorToken(currentLexeme.toString().toCharArray()[0])) {
 							buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Separator");
 						}
 						currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
 						currentLexemeIndex = forwardPointerIndex;
-
-					}
-					if (TokenPatternMatcher.isMatchingSeparatorToken(currentChar)) {
-						buildTokenObjAndAddToTokenList(String.valueOf(currentChar), "Separator");
-						currentLexeme.deleteCharAt(currentLexeme.length() - 1);
-						currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
-						currentLexemeIndex = forwardPointerIndex;
-
-					}
-					if (TokenPatternMatcher.isMatchingCharEscapeLiteralToken(currentChar)) {
+					} else if (TokenPatternMatcher.isMatchingCharEscapeLiteralToken(currentChar)) {
 						buildLiteralTypeTokenObjAndAddToTokenList(
 								DataTypeConversionUtils.escapeCharToStringConversion(currentChar), "Literal", "char");
 						currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
@@ -190,7 +197,6 @@ public class SourceCodeFileReaderUtils {
 				}
 			}
 			if (isCommentTokenDetected) {
-				buildTokenObjAndAddToTokenList(currentLexeme.toString(), "Comments");
 				currentLexeme = currentLexeme.delete(0, forwardPointerIndex - currentLexemeIndex);
 				currentLexemeIndex = forwardPointerIndex;
 			}

@@ -1,8 +1,8 @@
+
 Issue 1: We are expecting all token (except string , char literals, comments) to be separated by whitespace ' '
 	     We need to start supporting token creation without whitespace between to tokens
 
-Issue 2:
-					/
+Issue 2:		/
 					  TODO Issue Add Separator Token in case if it combined
 					  with keywork or identifier.
 					  
@@ -27,3 +27,9 @@ Issue 2:
 					  Separator value:)
 					  
 					 /
+
+Enhancement 1: SEPARATORS_PERIOD_TOKEN Support in case of Math.
+ 
+Enhancement 2:  Currently Lexical analyse does not support "longest token rule"
+         		i.e. it includes characters in a token until it reaches a character
+         		that cannot be included.

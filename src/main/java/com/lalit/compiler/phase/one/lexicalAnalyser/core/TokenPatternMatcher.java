@@ -58,13 +58,7 @@ public class TokenPatternMatcher {
 		return false;
 	}
 
-	// Transition Diagram for Literals i.e. int , double , float, boolean,
-	// String, null
-	public boolean isMatchingLiteralPattern(char charac) {
-
-		return false;
-	}
-
+	// Transition Diagram for int literal
 	public static boolean isMatchingIntLiteralPattern(String word) {
 		if (word.length() == 0) {
 			return false;
@@ -74,6 +68,31 @@ public class TokenPatternMatcher {
 			if (!isMatchingNumericPattern(chara))
 				return false;
 		return true;
+	}
+
+	// Transition Diagram for double literal
+	public static boolean isMatchingDoubleLiteralPattern(String word) {
+		char[] characters = word.toCharArray();
+		for (char chara : characters) {
+			boolean isValidChar = false;
+			for (char numChar : ASCIICharactersSets.DOUBLE_ALLOWED_CHAR) {
+				if (chara == numChar) {
+					isValidChar = true;
+					break;
+				}
+			}
+			if (!isValidChar)
+				return false;
+		}
+		return true;
+	}
+
+	// Transition Diagram for boolean literal
+	public static boolean isMatchingBooleanLiteralPattern(String word) {
+		if ("true".equals(word) || "false".equals(word)) {
+			return true;
+		}
+		return false;
 	}
 
 	// Transition Diagram for Arithimatic or Logical Operators

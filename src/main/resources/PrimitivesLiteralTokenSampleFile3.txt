@@ -1,0 +1,22 @@
+class Test {
+//Comment
+int v = 10 ;
+/*Comment*/
+double d = 14.3434 ;
+double d1 = 3.518E+15 ;
+/* 
+*Comment
+*
+*
+*/
+double d2 = .000000000000003518 ;
+double d3 = 0.000000000000003518 ;
+double d4 = 3.518E-15 ;
+double d5 = 1.E3 ;
+boolean b = false ;
+boolean b1 = true ;
+char c = 'd' ;
+String s = "This is string literal" ;
+Math . max ( count , limit );
+
+}

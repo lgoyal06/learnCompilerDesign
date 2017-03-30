@@ -9,7 +9,9 @@ public class TokenTypes {
 			"finally", "long", "strictfp", "volatile", "class", "float", "native", "super", "while", "const", "for",
 			"new", "synchronized" };
 
-	public static final char[] SEPARATORS_TOKEN_LIST = new char[] { ';', ',', '.', '(', ')', '{', '}', '[', ']' };
+	public static final char[] SEPARATORS_TOKEN_LIST = new char[] { ';', ',', '(', ')', '{', '}', '[', ']' };
+
+	public static final char SEPARATORS_PERIOD_TOKEN = '.';
 
 	public static final String[] OPERATORS_TOKEN_LIST = new String[] { "=", ">", "<", "!", "~", "?", ",", ":", "==",
 			"<=", ">=", "!=", "&&", "||", "++", "--", "+", "-", "*", "/", "&", "|", "^", "%", "<<", ">>", ">>>", "+=",
