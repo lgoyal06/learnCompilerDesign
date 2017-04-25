@@ -1,0 +1,19 @@
+Step 1 : Arithmatic Expression Production
+Note : Input to parser
+---------------------------------
+
+E - > TE'
+E' -> +TE' | $ 
+T - > FT'
+T' -> *FT'|$
+F - > (E) | identifier
+
+Points
+  > Production should be free from left recursion and left factored
+                    > Algo to remove left recursion and left facotoring
+  > Ambiguity should be removed
+                    > Algo
+                    
+Step 2: Parser will generate Parsing Table  
+-------Parsing table------------------
+Non-terminal                  Input Symbol
