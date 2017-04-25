@@ -33,3 +33,6 @@ Enhancement 1: SEPARATORS_PERIOD_TOKEN Support in case of Math.
 Enhancement 2:  Currently Lexical analyse does not support "longest token rule"
          		i.e. it includes characters in a token until it reaches a character
          		that cannot be included.
+         		
+         		
+Issue 3: Add Line number attribute to Tokens  
